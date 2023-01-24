@@ -28,7 +28,8 @@ mod tests {
         // concatenate all the prepared bytes-slices
         let input = [version, delimiter, timestamp, delimiter, body.as_bytes()].concat();
         // feed the prepared data into hmac::verify
-        let actual = hmac::verify(&signing_key, &input, &expected_sig);
+        hmac::verify(&signing_key, &input, &expected_sig)?;
+        // protecting against replay attacks is still required on top of this!
         let expected = Ok(());
         assert_eq!(expected, actual);
     }
