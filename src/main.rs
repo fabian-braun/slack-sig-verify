@@ -14,14 +14,20 @@ mod tests {
         let expected_sig = "v0=a2114d57b48eac39b9ad189dd8316235a7b4a8d21a10bd27519666489c69b503";
         let signing_key = "8f742231b10e8888abcd99yyyzzz85a5";
 
+        // strip the prefix from the expected signature first
         let expected_sig = expected_sig.strip_prefix("v0=").unwrap();
+        // hex-decode the result to a byte-slice
         let expected_sig = hex::decode(expected_sig).unwrap();
+        // use as_bytes on timestamp and signing_key (these are no hex-Strings)
         let timestamp = timestamp.as_bytes();
         let signing_key = signing_key.as_bytes();
+        // initialize the hmac Key
         let signing_key = hmac::Key::new(hmac::HMAC_SHA256, signing_key);
         let delimiter = ":".as_bytes();
         let version = "v0".as_bytes();
+        // concatenate all the prepared bytes-slices
         let input = [version, delimiter, timestamp, delimiter, body.as_bytes()].concat();
+        // feed the prepared data into hmac::verify
         let actual = hmac::verify(&signing_key, &input, &expected_sig);
         let expected = Ok(());
         assert_eq!(expected, actual);
